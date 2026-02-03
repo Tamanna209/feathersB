@@ -13,10 +13,12 @@ const createAccount = async (req, res) => {
     }
 
     const user = await UserModel.findOne({ email: email });
-    if (user) {
+    console.log(user);
+
+    if (user && user.isVerified) {
       return res
         .status(400)
-        .json({ message: "User accoutn is already created" });
+        .json({ message: "User account is already created" });
     }
 
     const hashedPass = await bcrypt.hash(password, 10);
@@ -38,29 +40,59 @@ const createAccount = async (req, res) => {
 
     const otpExpiry = Date.now() + 2 * 60 * 1000;
     console.log(otpExpiry);
-    
+
     const newUser = new UserModel({
       username: username,
       email: email,
       password: hashedPass,
-      otp:otp,
-      otpExpiry:otpExpiry
+      otp: otp,
+      otpExpiry: otpExpiry,
     });
 
     await newUser.save();
 
     res.status(201).json({
-        message:'User created Successfully',
-        newUser
-    })
+      message: "User created Successfully",
+      newUser,
+    });
   } catch (error) {
     console.log(error);
-    
+
     return res.status(500).json({
-        message:error.message
-    })
+      message: error.message,
+    });
   }
 };
 
+//verifyEmail
+const verifyEmail = async (req, res) => {
+  const email = req.params.email;
+  const { otp } = req.body;
 
-module.exports={createAccount}
+  const userFound = await UserModel.findOne({ email: email });
+
+  if (!userFound) {
+    return res.json({ message: "Please check the email id" });
+  }
+
+  if (!otp) {
+    return res.json({ message: "Please enter the otp" });
+  }
+
+  if (userFound.isVerified) {
+    return res.json({ message: "User already created with this email" });
+  }
+
+  if (otp != userFound.otp || userFound.otpExpiry < Date.now()) {
+    return res.json({ message: "OTP not matched or expired" });
+  }
+
+  userFound.otp = null;
+  userFound.isVerified = true;
+  userFound.otpExpiry = null;
+  await userFound.save();
+
+  return res.json({ message: "OTP matched and Account created Successfully" });
+};
+
+module.exports = { createAccount, verifyEmail };
