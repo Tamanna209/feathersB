@@ -95,4 +95,10 @@ const verifyEmail = async (req, res) => {
   return res.json({ message: "OTP matched and Account created Successfully" });
 };
 
+
+
+//login
+const login=async(req, res)=>{
+    
+}
 module.exports = { createAccount, verifyEmail };
