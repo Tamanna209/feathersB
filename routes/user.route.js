@@ -1,6 +1,6 @@
 const express=require("express");
-const { createAccount, verifyEmail, login, post } = require("../controllers/user.controller");
-const authUser = require("../middlewares/authUser.middlewre");
+const { createAccount, verifyEmail, login } = require("../controllers/user.controller");
+
 
 const userRouter=express.Router();
 
@@ -10,5 +10,4 @@ userRouter.post("/verify/:email" , verifyEmail);
 
 userRouter.post("/login", login);
 
-userRouter.get("/post",  authUser, post);
 module.exports=userRouter;

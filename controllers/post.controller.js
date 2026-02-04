@@ -37,7 +37,7 @@ const createPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const posts = await PostModel.find().populate("createdBy");
+    const posts = await PostModel.find().populate("createdBy" , "username email");
     if(!posts){
         return res.status(200).json({
             message:'No posts yes'

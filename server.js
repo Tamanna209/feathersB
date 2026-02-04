@@ -9,7 +9,7 @@ const cookieParser=require("cookie-parser");
 const upload = require("./middlewares/post.middleware");
 const postRouter = require("./routes/post.route");
 const authUser = require("./middlewares/authUser.middlewre");
-app.use(cors({origin:'http://localhost:5173/'}));
+app.use(cors({origin:'http://localhost:5173'}));
 app.use(express.json());
 app.use(cookieParser());
 
