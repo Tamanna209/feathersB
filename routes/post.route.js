@@ -4,7 +4,7 @@ const upload = require("../middlewares/post.middleware");
 const authUser = require("../middlewares/authUser.middlewre");
 const postRouter=express.Router();
 
-postRouter.post('/postCreate' , authUser,  upload.array('medias'),createPost);
+postRouter.post('/postCreate/:id' , authUser,  upload.array('medias'),createPost);
 postRouter.get('/posts' ,   authUser, getPosts);
 
 module.exports=postRouter;

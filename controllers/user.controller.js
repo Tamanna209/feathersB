@@ -46,9 +46,14 @@ const createAccount = async (req, res) => {
 
     await newUser.save();
 
+     const userResponse = {
+      _id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+    };
     res.status(201).json({
       message: "User created Successfully",
-      user: email,
+       userResponse
     });
   } catch (error) {
     console.log(error);
@@ -62,10 +67,10 @@ const createAccount = async (req, res) => {
 //verifyEmail
 const verifyEmail = async (req, res) => {
   try {
-    const email = req.params.email;
+    const id = req.params.id;
     const { otp } = req.body;
 
-    const userFound = await UserModel.findOne({ email: email });
+    const userFound = await UserModel.findById(id);
 
     if (!userFound) {
       return res.json({ message: "Please check the email id" });
@@ -92,7 +97,7 @@ const verifyEmail = async (req, res) => {
 
     return res.json({
       message: "OTP matched and Account created Successfully",
-      user:userFound._id
+      user:userFound
     });
   } catch (error) {
     return res.status(500).json(error.message);
@@ -139,9 +144,21 @@ const login = async (req, res) => {
     }
     console.log("token", token);
 
-    res.cookie("token", token);
+    res.cookie("token", token , {
+       httpOnly:true,
+       secure:false,
+       maxAge:2*60*1000
+    });
+
+    const userResponse={
+      id:userExist._id,
+      username:userExist.username,
+      email:userExist.email
+    }
     res.status(200).json({
       message: `Welcome ${userExist.username}`,
+      userResponse
+      
     });
   } catch (error) {
     console.log(error);

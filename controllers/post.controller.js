@@ -3,8 +3,10 @@ const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 const PostModel = require("../models/posts.model");
 const createPost = async (req, res) => {
-  const { email, caption } = req.body;
-  const user = await UserModel.findOne({ email: email });
+    try {
+  const id=req.params.id;
+  const {  caption } = req.body;
+  const user = await UserModel.findById(id);
 
   if (!user) {
     return res.status(400).json({
@@ -33,6 +35,10 @@ const createPost = async (req, res) => {
     message: "Post created successfully",
     postCreated,
   });
+    } catch (error) {
+     console.log(error);
+      
+    }
 };
 
 const getPosts = async (req, res) => {

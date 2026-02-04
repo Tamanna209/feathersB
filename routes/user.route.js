@@ -6,7 +6,7 @@ const userRouter=express.Router();
 
 userRouter.post("/register", createAccount);
 
-userRouter.post("/verify/:email" , verifyEmail);
+userRouter.post("/verify/:id" , verifyEmail);
 
 userRouter.post("/login", login);
 
