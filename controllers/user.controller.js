@@ -1,6 +1,7 @@
 const transporter = require("../config/mail.config");
 const UserModel = require("../models/users.model");
 const bcrypt = require("bcrypt");
+const jwt=require("jsonwebtoken");
 // create account
 const createAccount = async (req, res) => {
   try {
@@ -99,6 +100,60 @@ const verifyEmail = async (req, res) => {
 
 //login
 const login=async(req, res)=>{
+  try {
+       const {email , password}=req.body;
     
+    if(!email || !password){
+      return res.status(400).json({
+        message:'Please fill all the details'
+      })
+    }
+
+    const userExist=await UserModel.findOne({email:email})
+
+    if(!userExist){
+      return res.status(400).json({
+        message:'Please create an account first'
+      })
+    }
+
+    const isMatched=await bcrypt.compare(password , userExist.password)
+
+    if(!isMatched){
+      return res.status(400).json({
+        message:'Email or password is wrong .Please try again later'
+      })
+    }
+     
+    const token=await jwt.sign({id: userExist._id , email} , 'secret'  , {expiresIn:'2h'}) 
+
+    if(!token){
+      return res.status(400).json({
+        message:'There is somethig wrong Please try again later'
+      })
+    }
+    console.log('token',token);
+    
+    res.cookie('token' , token)
+    res.status(200).json({
+      message:`Welcome ${userExist.username}`
+    })
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error.message)
+    
+  }
+   
 }
-module.exports = { createAccount, verifyEmail };
+
+
+const post=async(req, res)=>{
+  console.log(req.user);
+  const email=req.user.email;
+  const user=await UserModel.findOne({email:email});
+
+  return res.json(`Welcome to Posts section Dear ${user.username}`)
+  
+}
+module.exports = { createAccount, verifyEmail  , login , post};
